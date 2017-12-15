@@ -24,7 +24,11 @@ import org.springframework.web.client.RestTemplate;
 
 public class Scan extends AppCompatActivity {
 
-    static final String ACTION_SCAN = "com.google.zxing.client.android.SCAN";
+    private static final String ACTION_SCAN = "com.google.zxing.client.android.SCAN";
+
+    private static final String MESSAGE_URL = "https://scan-rest-backend.herokuapp.com/message";
+
+    private RestTemplate restTemplate = new RestTemplate();
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -141,8 +145,6 @@ public class Scan extends AppCompatActivity {
         @Override
         protected ScanMessage doInBackground(Void... params) {
             try {
-                final String url = "https://scan-rest-backend.herokuapp.com/message";
-                RestTemplate restTemplate = new RestTemplate();
                 restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
                 ScanMessage message = new ScanMessage();
@@ -153,7 +155,8 @@ public class Scan extends AppCompatActivity {
 
                 HttpEntity<ScanMessage> request = new HttpEntity<>(message);
                 ResponseEntity<ScanMessage> response = restTemplate
-                        .exchange(url, HttpMethod.POST, request, ScanMessage.class);
+                        .exchange(MESSAGE_URL, HttpMethod.POST, request, ScanMessage.class);
+
                 return response.getBody();
             } catch (Exception e) {
                 Log.e("MainActivity", e.getMessage(), e);
